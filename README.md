@@ -12,16 +12,20 @@ Implementation of QKmedians from the paper: [https://arxiv.org/abs/2301.10780](2
 
 ## How to run an example?
 
-To run a particular instance of the problem we have to set up the initial
-arguments:
-- `nqubits` (int): number of quantum bits.
-- `layers` (int): number of ansatz layers.
-- `compress` (int): number of compressed/discarded qubits.
-- `lambdas` (list or array): different λ on the Ising model to consider for the training.
+### Download dataset
+Dataset used in the paper above can be downloaded from `Zenodo` : 
+[https://zenodo.org/record/7673769](record/7673769)
 
-As an example, in order to compress 2 qubits on an initial quantum state with 6 qubits, and using 3 layers,
-you should execute the following command:
+### Run training
+To run a training of quantum k-medians algorithm we need to provide arguments:
+- `train_size` (int): number of samples for training
+- `read_file` (str): path to training dataset
+- `device_name` (str): name of device for running quantum circuit simulation
+- `seed` (int): seed for consistent results in training
+- `k` (int): number of clusters
+- `tolerance` (float): convergence tolerance
+- `save_dir` (str): path to save results
 
 ```python
-python main.py --nqubits 6 --layers 3 --compress 2 --lambdas [0.9, 0.95, 1.0, 1.05, 1.10]
+python train_qkmedians.py --train_size 600 --read_file '/data/training_dataset.h5' --k 2 --device_name 'GPU:/0' --seed 123 --tolerance 1e-3 --save_dir 'save_directory'
 ```

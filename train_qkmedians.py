@@ -92,20 +92,22 @@ if __name__ == "__main__":
         "-train_size", dest="train_size", type=int, help="training data size"
     )
     parser.add_argument(
-        "-read_file", dest="read_file", type=str, help="training data file"
+        "-read_file", dest="read_file", type=str, help="path to training data"
     )
     parser.add_argument(
         "-seed", dest="seed", type=int, help="seed for consistent results"
     )
-    parser.add_argument("-k", dest="k", type=int, default=2, help="number of classes")
     parser.add_argument(
-        "-tolerance", dest="tolerance", type=float, default=1.0e-3, help="tolerance"
+        "-k", dest="k", type=int, default=2, help="number of classes"
+    )
+    parser.add_argument(
+        "-tolerance", dest="tolerance", type=float, default=1.0e-3, help="convergence tolerance"
     )
     parser.add_argument(
         "-save_dir", dest="save_dir", type=str, help="directory to save results"
     )
     parser.add_argument(
-        "-device_name", dest="device_name", type=str, help="name of GPU, if using"
+        "-device_name", dest="device_name", type=str, help="name of device for running quantum circuit simulation"
     )
 
     args = parser.parse_args()
