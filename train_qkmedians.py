@@ -5,11 +5,10 @@ import qibo
 
 qibo.set_backend("tensorflow")
 
-import qad.algorithms.kmedians.quantum.qkmedians as qkmed
+import qkmedians as qkmed
 
 
 def train_qkmedians(
-    latent_dim,
     train_size,
     read_file,
     device_name,
@@ -22,8 +21,6 @@ def train_qkmedians(
 
     Parameters
     ----------
-    latent_dim : int
-        Latent dimension of input data.
     train_size : int
         Number of training samples.
     read_file : str
@@ -51,29 +48,25 @@ def train_qkmedians(
             np.random.seed(seed)  # matters for small data sizes
         np.random.shuffle(data_train)
 
-    centroids = qkmed.initialize_centroids(data_train, k)  # Intialize centroids
+    # Intialize centroids
+    centroids = qkmed.initialize_centroids(data_train, k)
 
-    i = 0
-    new_tol = 1
+    i = 0; new_tol = 1
     loss = []
     while True:
-        cluster_label, _ = qkmed.find_nearest_neighbour_DI(
-            data_train, centroids, device_name
-        )  # find nearest centroids
-        print(f"Found cluster assignments for iteration: {i+1}")
-        new_centroids = qkmed.find_centroids_GM(
-            data_train, cluster_label, clusters=k
-        )  # find centroids
-
+        # find nearest centroids
+        cluster_label, _ = qkmed.find_nearest_neighbour(data_train, centroids, device_name)
+        # find new centroids
+        new_centroids = qkmed.find_centroids(data_train, cluster_label, clusters=k)
+        # calculate loss -> distance old_centroids to new_centroids
         loss_epoch = np.linalg.norm(centroids - new_centroids)
         loss.append(loss_epoch)
+
         if loss_epoch < tolerance:
             centroids = new_centroids
             print(f"Converged after {i+1} iterations.")
             break
-        elif (
-            loss_epoch > tolerance and i > new_tol * 200
-        ):  # if after 200*new_tol epochs, difference != 0, lower the tolerance
+        elif (loss_epoch > tolerance and i > new_tol * 200):# if after 200*new_tol epochs, difference != 0, lower the tolerance
             tolerance *= 10
             new_tol += 1
         i += 1
@@ -81,23 +74,19 @@ def train_qkmedians(
 
     if save_dir:
         np.save(
-            f"{save_dir}/cluster_label_lat{latent_dim}_{str(train_size)}.npy",
+            f"{save_dir}/cluster_label.npy",
             cluster_label,
         )
         np.save(
-            f"{save_dir}/centroids_lat{latent_dim}_{str(train_size)}.npy", centroids
+            f"{save_dir}/centroids.npy", centroids
         )
-        np.save(f"{save_dir}/LOSS_lat{latent_dim}_{str(train_size)}.npy", loss)
-        print("Centroids and labels saved!")
+        np.save(f"{save_dir}/loss.npy", loss)
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="read arguments for qkmedians training"
-    )
-    parser.add_argument(
-        "-latent_dim", dest="latent_dim", type=int, help="latent dimension"
     )
     parser.add_argument(
         "-train_size", dest="train_size", type=int, help="training data size"
@@ -125,7 +114,6 @@ if __name__ == "__main__":
         qibo.set_device(args.device_name)
 
     train_qkmedians(
-        args.latent_dim,
         args.train_size,
         args.read_file,
         args.device_name,

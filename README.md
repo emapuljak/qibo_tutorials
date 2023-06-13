@@ -4,12 +4,11 @@ Implementation of QKmedians from the paper: [https://arxiv.org/abs/2301.10780](2
 
 ## Algorithm's pseudocode
 
-![pseudo](pseudocode_QKmed.jpeg)
+![pseudo](figures/pseudocode_QKmed.jpeg)
 
 ## Distance calculation quantum circuit
 
-![Distance circuit](DistCirc.png)
-
+![Distance circuit](figures/DistCirc.png)
 
 ## How to run an example?
 
