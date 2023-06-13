@@ -1,11 +1,11 @@
 # Quantum k-medians clustering
 
-Implementation from paper: [https://arxiv.org/abs/2301.10780](2301.10780).
+Implementation of QKmedians from the paper: [https://arxiv.org/abs/2301.10780](2301.10780).
 
 ## Algorithm's pseudocode
 
 ```
-    Randomly initialize **k** centroids
+    Randomly initialize *k* centroids
     Until convergence:
         Find closest cluster centroid
             - For each data point use quantum subroutine for distance calculation to calculate distance to each centroid
@@ -16,7 +16,7 @@ Implementation from paper: [https://arxiv.org/abs/2301.10780](2301.10780).
 
 ## Distance calculation quantum circuit
 
-![Distance circuit](DistCirc.pdf)
+![Distance circuit](DistCirc.png)
 
 
 ## How to run an example?
