@@ -1,6 +1,6 @@
 # Quantum k-medians clustering
 
-Implementation of QKmedians from the paper: [https://arxiv.org/abs/2301.10780](2301.10780).
+Implementation of QKmedians from the paper: [2301.10780](https://arxiv.org/abs/2301.10780).
 
 ## Algorithm's pseudocode
 
@@ -14,7 +14,7 @@ Implementation of QKmedians from the paper: [https://arxiv.org/abs/2301.10780](2
 
 ### Download dataset
 Dataset used in the paper above can be downloaded from `Zenodo` : 
-[https://zenodo.org/record/7673769](record/7673769)
+[record/7673769](https://zenodo.org/record/7673769)
 
 ### Run training
 To run a training of quantum k-medians algorithm we need to provide arguments:
