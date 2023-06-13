@@ -4,15 +4,7 @@ Implementation of QKmedians from the paper: [https://arxiv.org/abs/2301.10780](2
 
 ## Algorithm's pseudocode
 
-```
-    Randomly initialize *k* centroids
-    Until convergence:
-        Find closest cluster centroid
-            - For each data point use quantum subroutine for distance calculation to calculate distance to each centroid
-            - Find minimal distance (either classicaly or using **Grover** search)
-        Find new cluster centroids
-            For each cluster find **median** using hybrid classical-quantum subroutine
-```
+![pseudo](pseudocode_QKmed.jpeg)
 
 ## Distance calculation quantum circuit
 
