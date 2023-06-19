@@ -27,5 +27,5 @@ To run a training of quantum k-medians algorithm we need to provide arguments:
 - `save_dir` (str): path to save results
 
 ```python
-python train_qkmedians.py --train_size 600 --read_file '/data/training_dataset.h5' --k 2 --device_name 'GPU:/0' --seed 123 --tolerance 1e-3 --save_dir 'save_directory'
+python train_qkmedians.py --train_size 600 --read_file '/data/training_dataset.h5' --k 2 --device_name '/GPU:0' --seed 123 --tolerance 1e-3 --save_dir 'save_directory'
 ```
