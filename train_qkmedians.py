@@ -2,8 +2,7 @@ import argparse
 import numpy as np
 import h5py
 import qibo
-
-qibo.set_backend("tensorflow")
+qibo.set_backend("qibojit")
 
 import qkmedians as qkmed
 
@@ -11,10 +10,11 @@ import qkmedians as qkmed
 def train_qkmedians(
     train_size,
     read_file,
-    device_name,
     seed=None,
     k=2,
     tolerance=1.0e-3,
+    min_type='classic',
+    nshots=10000,
     save_dir=None,
 ):
     """Performs training of quantum k-medians.
@@ -25,14 +25,16 @@ def train_qkmedians(
         Number of training samples.
     read_file : str
         Name of the file where training data is saved.
-    device_name : str
-        Name of device for running a simulation of quantum circuit.
     seed : int
         Seed for data shuffling.
     k : int
         Number of classes in quantum k-medians.
     tolerance : float
         Tolerance for algorithm convergence.
+    min_type : str
+        Type of minimization for distance calculation, classic or quantum.
+    nshots : int
+        Number of shots for executing quantum circuit.
     save_dir : str
         Name of the file for saving results.
     """
@@ -47,7 +49,7 @@ def train_qkmedians(
         if seed:
             np.random.seed(seed)  # matters for small data sizes
         np.random.shuffle(data_train)
-
+    
     # Intialize centroids
     centroids = qkmed.initialize_centroids(data_train, k)
 
@@ -55,9 +57,10 @@ def train_qkmedians(
     loss = []
     while True:
         # find nearest centroids
-        cluster_label, _ = qkmed.find_nearest_neighbour(data_train, centroids, device_name)
+        cluster_label, _ = qkmed.find_nearest_neighbour(data_train, centroids, min_type, nshots)
         # find new centroids
         new_centroids = qkmed.find_centroids(data_train, cluster_label, clusters=k)
+        
         # calculate loss -> distance old_centroids to new_centroids
         loss_epoch = np.linalg.norm(centroids - new_centroids)
         loss.append(loss_epoch)
@@ -107,20 +110,24 @@ if __name__ == "__main__":
         "--save_dir", dest="save_dir", type=str, help="directory to save results"
     )
     parser.add_argument(
-        "--device_name", dest="device_name", type=str, help="name of device for running quantum circuit simulation"
+        "--min_type", dest="min_type", type=str, default='classic', help="Type of minimization for distance calculation, classic or quantum"
+    )
+    parser.add_argument(
+        "--nshots", dest="nshots", type=int, default=10000, help="Number of shots for executing quantum circuit"
     )
 
     args = parser.parse_args()
-
-    if args.device_name:
-        qibo.set_device(args.device_name)
+    
+    if args.min_type not in ['classic', 'quantum']:
+        raise ValueError('Minimization is either classic or quantum procedure.')
 
     train_qkmedians(
         args.train_size,
         args.read_file,
-        args.device_name,
         args.seed,
         args.k,
         args.tolerance,
+        args.min_type,
+        args.nshots,
         args.save_dir,
     )

@@ -6,7 +6,7 @@ from qibo import gates
 from grover import grover_qc
 from oracle import create_oracle_circ
 
-def duerr_hoyer_algo(distances, device_name='None'):
+def duerr_hoyer_algo(distances, device_name=None):
     """
         distance: [1, k] where k is number of cluster centers
     """
