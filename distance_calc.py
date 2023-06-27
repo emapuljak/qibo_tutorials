@@ -3,7 +3,7 @@ import math
 import tensorflow as tf
 from qibo.models import Circuit
 from qibo import gates
-from util import calc_norm
+import util as u
 
 def pad_input(X):
     """Adds 0s if X log2(X.dim) != round int.
@@ -46,7 +46,7 @@ def DistCalc(a, b, shots_n=10000):
 
     """
     num_features = len(a)
-    norm = calc_norm(a, b)
+    norm = u.calc_norm(a, b)
     a_norm = a / norm
     b_norm = b / norm
 
