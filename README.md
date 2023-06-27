@@ -11,6 +11,7 @@ Implementation of QKmedians from the paper: [2301.10780](https://arxiv.org/abs/2
 ![Distance circuit](figures/DistCirc.png)
 
 ## How to run an example?
+Scripts are using `qibojit` as default backend.
 
 ### Download dataset
 Dataset's dimensionality is reduced by passing it through autoencoder. If you are interested more, please refer to [[\*]](https://arxiv.org/abs/2301.10780).\
