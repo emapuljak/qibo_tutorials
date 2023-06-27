@@ -13,7 +13,7 @@ Implementation of QKmedians from the paper: [2301.10780](https://arxiv.org/abs/2
 ## How to run an example?
 
 ### Download dataset
-Dataset's dimensionality is reduced by passing it through autoencoder. If you are interested more, please refer to [\*](https://arxiv.org/abs/2301.10780).\
+Dataset's dimensionality is reduced by passing it through autoencoder. If you are interested more, please refer to [[\*]](https://arxiv.org/abs/2301.10780).\
 Reduced dataset can be downloaded from `Zenodo` : 
 [record/7673769](https://zenodo.org/record/7673769)\
 Small portion of dataset in `data` folder:
@@ -36,8 +36,8 @@ To run a training of quantum k-medians algorithm we need to provide arguments:
 python train_qkmedians.py --train_size 600 --read_file 'data/latentrep_QCD_sig.h5' --k 2 --seed 123 --tolerance 1e-3 --min_type 'classic' --save_dir 'save_directory'
 ```
 
-### Run evalutation
-To run an evalutation of quantum k-medians algorithm we need to provide arguments:
+### Run evaluation
+To run an evaluation of quantum k-medians algorithm we need to provide arguments:
 - `centroids_file` (str): name of the file for saved centroids coordinates
 - `data_qcd_file` (str): name of the file for test QCD dataset
 - `data_signal_file` (str): name of the file for test signal dataset
