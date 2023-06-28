@@ -1,9 +1,10 @@
 import argparse
+import os
+
 import numpy as np
 import h5py
 import qibo
-
-qibo.set_backend("tensorflow")
+qibo.set_backend("qibojit")
 
 import qkmedians as qkmed
 
@@ -11,11 +12,14 @@ import qkmedians as qkmed
 def train_qkmedians(
     train_size,
     read_file,
-    device_name,
     seed=None,
     k=2,
     tolerance=1.0e-3,
+    min_type='classic',
+    nshots=10000,
     save_dir=None,
+    verbose=False,
+    nprint=10
 ):
     """Performs training of quantum k-medians.
 
@@ -25,16 +29,22 @@ def train_qkmedians(
         Number of training samples.
     read_file : str
         Name of the file where training data is saved.
-    device_name : str
-        Name of device for running a simulation of quantum circuit.
     seed : int
         Seed for data shuffling.
     k : int
         Number of classes in quantum k-medians.
     tolerance : float
         Tolerance for algorithm convergence.
+    min_type : str
+        Type of minimization for distance calculation, classic or quantum.
+    nshots : int
+        Number of shots for executing quantum circuit.
     save_dir : str
         Name of the file for saving results.
+    nprint : int
+        Print loss function value each `nprint` epochs if `verbose` is True
+    verbose : str
+        Print log messages if True
     """
 
     # read train data
@@ -47,20 +57,29 @@ def train_qkmedians(
         if seed:
             np.random.seed(seed)  # matters for small data sizes
         np.random.shuffle(data_train)
-
+    
     # Intialize centroids
     centroids = qkmed.initialize_centroids(data_train, k)
+
+    if verbose:
+        print("Training of quantum k-medians")
+        print(f"The algorithm will automatically break after the target {tolerance} tolerance is reached")
 
     i = 0; new_tol = 1
     loss = []
     while True:
         # find nearest centroids
-        cluster_label, _ = qkmed.find_nearest_neighbour(data_train, centroids, device_name)
+        cluster_label, _ = qkmed.find_nearest_neighbour(data_train, centroids, min_type, nshots)
         # find new centroids
         new_centroids = qkmed.find_centroids(data_train, cluster_label, clusters=k)
+        
         # calculate loss -> distance old_centroids to new_centroids
         loss_epoch = np.linalg.norm(centroids - new_centroids)
         loss.append(loss_epoch)
+
+        # if verbose
+        if (i%nprint==0) and (verbose is True):
+            print(f"Loss at epoch {i+1}: {loss[-1]:.8}")
 
         if loss_epoch < tolerance:
             centroids = new_centroids
@@ -73,6 +92,10 @@ def train_qkmedians(
         centroids = new_centroids
 
     if save_dir:
+        # if save_dir doesn't exist it is created
+        if os.path.exists(save_dir) is False:
+           os.system(f"mkdir {save_dir}") 
+
         np.save(
             f"{save_dir}/cluster_label.npy",
             cluster_label,
@@ -89,38 +112,50 @@ if __name__ == "__main__":
         description="read arguments for qkmedians training"
     )
     parser.add_argument(
-        "-train_size", dest="train_size", type=int, help="training data size"
+        "--train_size", dest="train_size", type=int, help="training data size"
     )
     parser.add_argument(
-        "-read_file", dest="read_file", type=str, help="path to training data"
+        "--read_file", dest="read_file", type=str, help="path to training data"
     )
     parser.add_argument(
-        "-seed", dest="seed", type=int, help="seed for consistent results"
+        "--seed", dest="seed", type=int, help="seed for consistent results"
     )
     parser.add_argument(
-        "-k", dest="k", type=int, default=2, help="number of classes"
+        "--k", dest="k", type=int, default=2, help="number of classes"
     )
     parser.add_argument(
-        "-tolerance", dest="tolerance", type=float, default=1.0e-3, help="convergence tolerance"
+        "--tolerance", dest="tolerance", type=float, default=1.0e-3, help="convergence tolerance"
     )
     parser.add_argument(
-        "-save_dir", dest="save_dir", type=str, help="directory to save results"
+        "--save_dir", dest="save_dir", type=str, help="directory to save results"
     )
     parser.add_argument(
-        "-device_name", dest="device_name", type=str, help="name of device for running quantum circuit simulation"
+        "--min_type", dest="min_type", type=str, default='classic', help="Type of minimization for distance calculation, classic or quantum"
+    )
+    parser.add_argument(
+        "--nshots", dest="nshots", type=int, default=10000, help="Number of shots for executing quantum circuit"
+    )
+    parser.add_argument(
+        "--verbose", dest="verbose", type=bool, default=False, help="Verbose level during training"
+    )
+    parser.add_argument(
+        "--nprint", dest="nprint", type=int, default=10, help="Log messages are printed every nprint epochs"
     )
 
     args = parser.parse_args()
-
-    if args.device_name:
-        qibo.set_device(args.device_name)
+    
+    if args.min_type not in ['classic', 'quantum']:
+        raise ValueError('Minimization is either classic or quantum procedure.')
 
     train_qkmedians(
-        args.train_size,
-        args.read_file,
-        args.device_name,
-        args.seed,
-        args.k,
-        args.tolerance,
-        args.save_dir,
+        train_size=args.train_size,
+        read_file=args.read_file,
+        seed=args.seed,
+        k=args.k,
+        tolerance=args.tolerance,
+        min_type=args.min_type,
+        nshots=args.nshots,
+        save_dir=args.save_dir,
+        verbose=args.verbose,
+        nprint=args.nprint
     )

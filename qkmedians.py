@@ -44,12 +44,12 @@ def find_centroids(points, cluster_labels, clusters=2):
     k = points.shape[1]
     for j in range(clusters):
         points_class_i = points[cluster_labels == j]
-        median = np.median(points_class_i)
+        median = np.median(points_class_i, axis=0)
         centroids[j, :] = median
     return np.array(centroids)
 
 
-def find_nearest_neighbour(points, centroids, device_name=None, mintype='classic'):
+def find_nearest_neighbour(points, centroids, mintype='classic', shots_n=10000):
     """Find cluster assignments for points.
 
     Parameters
@@ -81,7 +81,7 @@ def find_nearest_neighbour(points, centroids, device_name=None, mintype='classic
         dist = []
         for j in range(k):  # distance of each training example to each centroid
             temp_dist, _ = distc.DistCalc(
-                points[i, :], centroids[j, :], device_name, shots_n=10000
+                points[i, :], centroids[j, :], shots_n=shots_n
             )  # returning back one number for all latent dimensions!
             dist.append(temp_dist)
         # assign cluster

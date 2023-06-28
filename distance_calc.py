@@ -3,7 +3,7 @@ import math
 import tensorflow as tf
 from qibo.models import Circuit
 from qibo import gates
-from util import calc_norm
+import util as u
 
 def pad_input(X):
     """Adds 0s if X log2(X.dim) != round int.
@@ -25,7 +25,7 @@ def pad_input(X):
     return X
 
 
-def DistCalc(a, b, device_name=None, shots_n=10000):
+def DistCalc(a, b, shots_n=10000):
     """Distance calculation using destructive interference.
 
     Parameters
@@ -46,7 +46,7 @@ def DistCalc(a, b, device_name=None, shots_n=10000):
 
     """
     num_features = len(a)
-    norm = calc_norm(a, b)
+    norm = u.calc_norm(a, b)
     a_norm = a / norm
     b_norm = b / norm
 
@@ -60,11 +60,10 @@ def DistCalc(a, b, device_name=None, shots_n=10000):
     qc = Circuit(n_qubits)
     qc.add(gates.H(0))
     qc.add(gates.M(0))
-    if device_name:
-        with tf.device(device_name):
-            result = qc.execute(initial_state=amplitudes, nshots=shots_n)
-    else:
-        result = qc.execute(initial_state=amplitudes, nshots=shots_n)
+    
+    result = qc.execute(initial_state=amplitudes, nshots=shots_n)
+    
     counts = result.frequencies(binary=True)
     distance = norm * math.sqrt(2) * math.sqrt((counts["1"] / shots_n))
+    
     return distance, qc
