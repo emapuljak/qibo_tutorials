@@ -1,12 +1,11 @@
 import numpy as np
-import tensorflow as tf
 import math
 from qibo.models import Circuit
 from qibo import gates
 from grover import grover_qc
 from oracle import create_oracle_circ
 
-def duerr_hoyer_algo(distances, device_name=None):
+def duerr_hoyer_algo(distances):
     """
         distance: [1, k] where k is number of cluster centers
     """
@@ -32,11 +31,7 @@ def duerr_hoyer_algo(distances, device_name=None):
         #grover circuit
         qc = grover_qc(qc, n, qc_oracle, n_indices_marked)
         
-        if device_name:
-            with tf.device(device_name):
-                counts = qc.execute(nshots=1000).frequencies(binary=True)
-        else:
-            counts = qc.execute(nshots=1000).frequencies(binary=True)
+        counts = qc.execute(nshots=1000).frequencies(binary=True)
         
         #measure highest probability
         probs = counts.items()
